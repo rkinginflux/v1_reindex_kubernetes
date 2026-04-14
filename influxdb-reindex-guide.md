@@ -100,3 +100,37 @@ For each additional data node:
 - The `initContainer` fixes ownership to ensure the main container (running as UID 999) can write to the data directories.
 - The `echo y` handles the prompt from `influx_inspect` warning about running as root.
 - Using a StatefulSet with stable PVCs ensures the same volume is reattached when scaling back up
+
+## YAML File By Example
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: influx-maintenance-1
+spec:
+  securityContext:
+    runAsUser: 0
+    fsGroup: 999
+  initContainers:
+  - name: fix-permissions
+    image: influxdb:1.12.3
+    command: ["/bin/sh", "-c", "chown -R 999:999 /data"]
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  containers:
+  - name: maintenance
+    image: influxdb:1.12.3
+    securityContext:
+      runAsUser: 999
+    command: ["/bin/sh", "-c", "echo y | influx_inspect buildtsi -datadir /data/data -waldir /data/wal"]
+    volumeMounts:
+    - name: data
+      mountPath: /data
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: influxdb-enterprise-v1-data-data-influxdb-enterprise-v1-data-1
+```
+
+
