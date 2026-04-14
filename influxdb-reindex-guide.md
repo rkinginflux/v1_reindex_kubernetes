@@ -1,4 +1,4 @@
-# InfluxDB Enterprise Data Node Reindexing in Kubernetes
+# InfluxDB Enterprise Data Node Reindexing by Example in Kubernetes
 
 When a data node in InfluxDB Enterprise needs to be reindexed, the process requires `influxd` to not be running. This guide covers how to access the data files in Kubernetes without the InfluxDB pod running.
 
